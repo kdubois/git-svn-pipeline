@@ -1,0 +1,40 @@
+/**
+ * Pipeline script to build updated Jenkins image
+ */
+pipeline {
+    agent any
+    environment {
+        DOCKER_REGISTRY = "my-docker-registry.com"
+    }
+    stages {
+        stage('Pull latest jenkins:lts image') {
+            steps {
+                sh 'docker pull jenkins/jenkins:lts'
+            }
+        }
+        stage('Build Image') {
+            steps {
+                withCredentials([string(credentialsId: 'MY_PROXY', variable: 'MY_PROXY')]) {
+                    sh "docker build -t ${DOCKER_REGISTRY}/infra/docker/jenkins --build-arg http_proxy=${MY_PROXY} CICD/jenkins"
+                }
+            }
+        }
+        stage('Push Image to Registry') {
+            steps {
+                withDockerRegistry(credentialsId: 'c8c91252-45ae-402d-b706-f938de218a2d', url: "${DOCKER_REGISTRY}") {
+                    sh "docker push ${DOCKER_REGISTRY}/infra/docker/jenkins"
+                }
+            }
+        }
+        stage('Cleanup local images') {
+            steps {
+                sh 'docker rmi -f jenkins/jenkins:lts'
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}

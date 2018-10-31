@@ -1,5 +1,0 @@
-// Script is located in gitlab-stirint.finbel.intra/infra/jenkins/vars/cicd.groovy
-cicd(
-        'my_project', // project name
-        'stirint_cbc'
-)

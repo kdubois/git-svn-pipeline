@@ -1,4 +1,4 @@
-# Jenkins CICD Pipeline Scripts for Containerized Java applications and an upstream Svn dependency
+# Jenkins CICD Pipeline Scripts for Containerized Java Applications and an Upstream Svn Dependency
 This repository contains scripts used in CICD Pipelines for projects that still depend on an upstream Subversion 
 repository but that use a local gitlab instance so they can leverage a better merge request and quality flow.  
 
@@ -22,3 +22,16 @@ It would be interesting to see these script applied/adapted to different project
 
 _(1) There's a 'runSonar' variable that can be set to false to disable the use of Sonar_  
 _(2) If Artifactory is not needed, remove the artifactory build commands from the cicd.groovy file_
+
+
+## Run the demo
+start the cicd applications:
+
+cd Docker && docker-compose up -d 
+Make sure all applications are up and running (gitlab takes several minutes). You can check on the status by opening
+the Portainer UI, by default hosted at http://localhost:9010
+Once gitlab is up and running, go to http://localhost and create a password for the root user, 
+then log in with username root and the password you just created
+
+Create group 'demo', click on create project and from the top menu, click 'Import project', and import this project.
+

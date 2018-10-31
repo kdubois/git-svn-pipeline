@@ -1,8 +1,0 @@
-// syncGitSvnPipeline should be added to Jenkins Global Pipeline Scripts
-syncGitSvnPipeline(
-        'my_project', // project
-        'https://my-svn-project-url/projectSRC/app/trunk', // svn repo
-        '', // revision
-        true, // Sync Automated Tests
-        true // Run Automated Tests
-)
