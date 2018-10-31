@@ -1,4 +1,4 @@
-# Jenkins CICD Pipeline Scripts for Dockerized Java applications and an upstream Svn dependency
+# Jenkins CICD Pipeline Scripts for Containerized Java applications and an upstream Svn dependency
 This repository contains scripts used in CICD Pipelines for projects that still depend on an upstream Subversion 
 repository but that use a local gitlab instance so they can leverage a better merge request and quality flow.  
 
