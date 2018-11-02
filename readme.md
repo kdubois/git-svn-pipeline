@@ -24,14 +24,22 @@ _(1) There's a 'runSonar' variable that can be set to false to disable the use o
 _(2) If Artifactory is not needed, remove the artifactory build commands from the cicd.groovy file_
 
 
-## Run the demo
-start the cicd applications:
+## Run the demo on windows with Docker Swarm
+start the cicd applications with Docker Swarm
 
-cd Docker && docker-compose up -d 
+docker swarm init (if you don't have a swarm running yet)
+docker stack deploy cicd --compose-file=Docker/docker-compose.yml
+
 Make sure all applications are up and running (gitlab takes several minutes). You can check on the status by opening
-the Portainer UI, by default hosted at http://localhost:9010
-Once gitlab is up and running, go to http://localhost and create a password for the root user, 
+the Portainer UI, by default hosted at http://cicd.intra:9010
+Once gitlab is up and running, go to http://cicd.intra and create a password for the root user, 
 then log in with username root and the password you just created
 
 Create group 'demo', click on create project and from the top menu, click 'Import project', and import this project.
+Go to Jenkins (http://cicd.intra:8080), and configure settings in Manage Jenkins (eg. install a JDK, Docker cloud, gitlab connection, sonarQube etc.)
+Create a pipeline job in Jenkins, and use the git repository you just created to run the demo/jenkins/cicd.Jenkinsfile
+
+configure docker to use docker daemon by adding custom external network: `docker network create -d overlay external_network
+`
+In Jenkins System Settings, Cloud > Docker set Docker Host URI to tcp://docker.for.win.localhost:2375
 
