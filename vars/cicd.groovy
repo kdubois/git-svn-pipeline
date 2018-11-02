@@ -23,14 +23,14 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
             MAVEN_HOME = '/var/jenkins_home/tools/hudson.tasks.Maven_MavenInstallation/maven3/apache-maven-3.5.3/'
             MVN = "${MAVEN_HOME}bin/mvn"
             PROJECT_U = project.toUpperCase()
-            TEST_URL = 'my-test-url.com'
-            GIT_REPO = "${project}/${project}" //
+            TEST_URL = 'localhost'
+            GIT_REPO = "root/${project}" //
             DOCKER_REGISTRY = "my-docker-registry.com"
             DB_IMAGE = "${DOCKER_REGISTRY}/${project}/${project}/db-${project}"
             WL_IMAGE = "${DOCKER_REGISTRY}/${project}/${project}/webserver-${project}"
             GITLAB_URL = "gitlab.intra"
             ARTIFACTORY_SERVER = "artifactory" // configure an artifactory server connection in the Jenkins artifactory plugin settings
-            INTERNAL_SERVER_PORT = "7001" // default 7001 for weblogic
+            INTERNAL_SERVER_PORT = "8080"
             INTERNAL_SERVER_DEBUG_PORT = "8453" // default 8453 for weblogic
             INTERNAL_DB_PORT = "50000" // default 50000 for db2
             DOCKER_REGISTRY_CREDENTIALS = "12345679-123456" // configure in Jenkins Credentials
@@ -68,7 +68,7 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
                                                 url          : "ssh://git@${GITLAB_URL}/${GIT_REPO}.git"
                                         ]
                                 ]])
-                        sh 'git merge origin/develop'
+                        sh 'git merge origin/master'
                     }
                 }
             }
@@ -171,9 +171,9 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
                 }
                 steps {
                     script {
-                        atBranch = params.AT_BRANCH != '' ? params.AT_BRANCH : 'develop'
+                        atBranch = params.AT_BRANCH != '' ? params.AT_BRANCH : 'master'
 
-                        if (!params.AT_BRANCH?.trim() && gitlabSourceBranch != 'develop') {
+                        if (!params.AT_BRANCH?.trim() && gitlabSourceBranch != 'master') {
                             atPipelineBranchExists = sh script: "git ls-remote --heads ssh://git@${GITLAB_URL}/${project}/at.git ${gitlabSourceBranch} | wc -l", returnStdout: true
 
                             if (atPipelineBranchExists.replaceAll("Warning.*", "").replaceAll("\\s", "").toInteger()) {
