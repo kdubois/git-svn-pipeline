@@ -17,7 +17,7 @@ syncGitSvnPipeline(
  * @param isAT If this script is called from an Automated Test Jenkinsfile, then run things a little differently
  * @return void
  */
-def call(String project, String svnRepo, String revision = '', boolean syncAT = true, boolean runAT = false, boolean isAT = false) {
+def syncGitSvnPipeline(String project, String svnRepo, String revision = '', boolean syncAT = true, boolean runAT = false, boolean isAT = false) {
     pipeline {
         agent any
         environment {

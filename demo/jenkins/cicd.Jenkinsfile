@@ -26,7 +26,7 @@ def wlImage
  * @param skipTests Skip all tests
  * @return void
  */
-def call(String project, String appPath = '', boolean hasDockerizedWebServer = true, boolean hasDB = true,
+def cicd(String project, String appPath = '', boolean hasDockerizedWebServer = true, boolean hasDB = true,
          boolean skipITs = false, boolean skipTests = false, boolean runSonar = true) {
     pipeline {
         agent any
