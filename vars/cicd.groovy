@@ -21,7 +21,7 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
         agent any
         environment {
             MAVEN_HOME = '/var/jenkins_home/tools/hudson.tasks.Maven_MavenInstallation/maven3/apache-maven-3.5.3/'
-            MVN = "${MAVEN_HOME}bin/mvn"
+            MVN = "maven3"
             PROJECT_U = project.toUpperCase()
             TEST_URL = 'localhost'
             GIT_REPO = "root/${project}" //
