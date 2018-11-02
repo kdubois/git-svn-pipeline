@@ -142,18 +142,13 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
                             skipTests = true
                             skipITs = true
                         }
-                        def resolve_server = Artifactory.server "${ARTIFACTORY_SERVER}"
-                        def deploy_server = Artifactory.server "${ARTIFACTORY_SERVER}"
 
-                        def rtMaven = Artifactory.newMavenBuild()
-                        // pushes snapshots to a local artifactory (handy for snaphots needed during merge requests when there are dependendies between different projects)
-                        rtMaven.deployer server: deploy_server, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
                         def goals = "jacoco:prepare-agent install jacoco:report  -Dtests.run.argLine= -Dfile.encoding=UTF-8 " +
-                                "-DskipITs=${skipITs} -DskipTests=${skipTests} -PDOCKER -s .m2/settings.xml -Duser.timezone=Europe/Brussels " +
+                                "-DskipITs=${skipITs} -DskipTests=${skipTests} -Duser.timezone=Europe/Brussels " +
                                 "-D${project}.project.db.host=${TEST_URL} -D${project}.project.db.port=${dbport ?: ''} " +
-                                "-Dcontainer.admin.port=${serverport} -Dcontainer.admin.host=${TEST_URL}"
-                        def buildInfo = rtMaven.run pom: 'pom.xml', goals: goals.toString()
-                        deploy_server.publishBuildInfo buildInfo
+                                "-Dcontainer.admin.port=${serverport} -Dcontainer.admin.host=${TEST_URL} -f demo/pom.xml "
+                        ${MVN} ${goals}
+
                         if (runSonar){
                             withSonarQubeEnv('SonarQube') {
                                 sh "${MVN} sonar:sonar -Dsonar.projectName=${PROJECT_U} -Dsonar.projectKey=${PROJECT_U}"
