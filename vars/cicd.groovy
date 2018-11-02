@@ -65,7 +65,7 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
                                 userRemoteConfigs                : [
                                         [
                                                 credentialsId: 'a2f915a3-9e75-42f6-b31e-c2c884d396da',
-                                                url          : "ssh://git@${GITLAB_URL}/${GIT_REPO}.git"
+                                                url          : "http://${GITLAB_URL}/${GIT_REPO}.git"
                                         ]
                                 ]])
                         sh 'git merge origin/master'
@@ -174,7 +174,7 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
                         atBranch = params.AT_BRANCH != '' ? params.AT_BRANCH : 'master'
 
                         if (!params.AT_BRANCH?.trim() && gitlabSourceBranch != 'master') {
-                            atPipelineBranchExists = sh script: "git ls-remote --heads ssh://git@${GITLAB_URL}/${project}/at.git ${gitlabSourceBranch} | wc -l", returnStdout: true
+                            atPipelineBranchExists = sh script: "git ls-remote --heads http://${GITLAB_URL}/${project}/at.git ${gitlabSourceBranch} | wc -l", returnStdout: true
 
                             if (atPipelineBranchExists.replaceAll("Warning.*", "").replaceAll("\\s", "").toInteger()) {
                                 println "branch exists in both source and AT repo"
@@ -191,7 +191,7 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
                              extensions                       : [],
                              submoduleCfg                     : [],
                              userRemoteConfigs                : [[credentialsId: 'a61fe617-4e1d-47db-aa11-fc048c4a7f2b',
-                                                                  url          : "ssh://git@${GITLAB_URL}/${project}/at.git"]]])
+                                                                  url          : "http://${GITLAB_URL}/${project}/at.git"]]])
                     // replace localhost with the test url of the jenkins server
                     sh "sed -i 's/localhost/${TEST_URL}/g' environment-config.xml"
                     // hack to replace ports with the ports that were created for the various docker containers
