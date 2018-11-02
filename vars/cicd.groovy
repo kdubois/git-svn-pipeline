@@ -97,7 +97,7 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
             stage('Build & Deploy Server') {
                 steps {
                     updateGitlabCommitStatus name: 'build', state: 'running'
-                    sh "${MVN} clean -DskipTests=true"
+                    sh "${MVN} clean -DskipTests=true -f demo/pom.xml"
                     script {
                         serverport = ''
                         dbport = ''
