@@ -42,4 +42,5 @@ Create a pipeline job in Jenkins, and use the git repository you just created to
 configure docker to use docker daemon by adding custom external network: `docker network create -d overlay external_network
 `
 In Jenkins System Settings, Cloud > Docker set Docker Host URI to tcp://docker.for.win.localhost:2375
+In Tools, configure JDK, then run a freestyle job with a maven step to make sure jdk and maven are installed 
 
