@@ -165,10 +165,10 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
                                 "-Dcontainer.admin.port=${serverport} -Dcontainer.admin.host=${TEST_URL}"
                         def buildInfo = rtMaven.run pom: 'pom.xml', goals: goals.toString()
                         deploy_server.publishBuildInfo buildInfo
-                    }
-                    if (runSonar){
-                        withSonarQubeEnv('SonarQube') {
-                            sh "${MVN} sonar:sonar -Dsonar.projectName=${PROJECT_U} -Dsonar.projectKey=${PROJECT_U}"
+                        if (runSonar){
+                            withSonarQubeEnv('SonarQube') {
+                                sh "${MVN} sonar:sonar -Dsonar.projectName=${PROJECT_U} -Dsonar.projectKey=${PROJECT_U}"
+                            }
                         }
                     }
 
