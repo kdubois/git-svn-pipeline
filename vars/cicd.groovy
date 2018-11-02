@@ -20,8 +20,6 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
     pipeline {
         agent any
         environment {
-            MAVEN_HOME = '/var/jenkins_home/tools/hudson.tasks.Maven_MavenInstallation/maven3/apache-maven-3.5.3/'
-            MVN = "maven3"
             PROJECT_U = project.toUpperCase()
             TEST_URL = 'localhost'
             GIT_REPO = "root/${project}" //
@@ -96,6 +94,9 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
             }
             stage('Build & Deploy Server') {
                 steps {
+                    script {
+                        def MVN = tool 'maven3'
+                    }
                     updateGitlabCommitStatus name: 'build', state: 'running'
                     sh "${MVN} clean -DskipTests=true"
                     script {
