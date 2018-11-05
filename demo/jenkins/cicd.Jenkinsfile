@@ -68,9 +68,6 @@ pipeline {
                 updateGitlabCommitStatus name: 'build', state: 'running'
                 sh "${mvn} clean -DskipTests=true -f ${projectPath}pom.xml"
                 script {
-                    serverPort = ''
-                    debugPort = ''
-
                     if (hasDockerizedWebServer) {
                         // Build artifact to be deployed in image
                         sh "${mvn} install -DskipTests=true -f ${projectPath}pom.xml -s ${projectPath}.m2/settings.xml"
@@ -108,9 +105,10 @@ pipeline {
                         skipITs = true
                     }
 
-                    def goals = "install -Dtests.run.argLine= -Dfile.encoding=UTF-8 " +
+                    def goals = "jacoco:prepare-agent install jacoco:report -Dtests.run.argLine= -Dfile.encoding=UTF-8 " +
                             "-DskipITs=${skipITs} -DskipTests=${skipTests} -Duser.timezone=Europe/Brussels " +
-                            "-Dlocal.server.port=${serverPort} -Dlocal.server.host=${serverHost} -Dlocal.server.protocol=${serverProtocol} -f ${projectPath}pom.xml "
+                            "-Dlocal.server.port=${serverPort} -Dlocal.server.host=${serverHost} " +
+                            "-Dlocal.server.protocol=${serverProtocol} -f ${projectPath}pom.xml "
                     sh "${mvn} ${goals}"
 
                     if (runSonar) {
