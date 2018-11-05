@@ -14,7 +14,7 @@ import javax.servlet.ServletContextListener;
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer {
 
-    private static Log logger = LogFactory.getLog(Application.class);
+    private static Log log = LogFactory.getLog(Application.class);
 
     @Bean
     protected ServletContextListener listener() {
@@ -22,12 +22,12 @@ public class Application extends SpringBootServletInitializer {
 
             @Override
             public void contextInitialized(ServletContextEvent sce) {
-                logger.info("ServletContext initialized");
+                log.info("ServletContext initialized");
             }
 
             @Override
             public void contextDestroyed(ServletContextEvent sce) {
-                logger.info("ServletContext destroyed");
+                log.info("ServletContext destroyed");
             }
 
         };
