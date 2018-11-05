@@ -58,9 +58,11 @@ pipeline {
                 sh "git pull origin master"
                 sh "git reset --hard origin/master"
                 withCredentials([usernamePassword(credentialsId: "${svnCredentials}", passwordVariable: 'svn_pw', usernameVariable: 'svn_user')]) {
-                    svnRebase = sh "echo ${svn_pw} | git svn rebase --use-log-author --authors-file=authors.txt", returnStdout: true
-                    while (svnRebase.contains('CONFLICT')) {
-                        svnRebase = sh script: 'git rebase --skip || true;', returnStdout: true
+                    script {
+                        svnRebase = sh "echo ${svn_pw} | git svn rebase --use-log-author --authors-file=authors.txt", returnStdout: true
+                        while (svnRebase.contains('CONFLICT')) {
+                            svnRebase = sh script: 'git rebase --skip || true;', returnStdout: true
+                        }
                     }
                 }
                 sh "git push -f origin master"
