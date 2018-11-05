@@ -28,7 +28,9 @@ _(2) If Artifactory is not needed, remove the artifactory build commands from th
 start the cicd applications with Docker Swarm
 
 docker swarm init (if you don't have a swarm running yet)
+Create custom external network (necessary on docker for windows): `docker network create -d overlay external_network`
 docker stack deploy cicd --compose-file=Docker/docker-compose.yml
+
 
 Make sure all applications are up and running (gitlab takes several minutes). You can check on the status by opening
 the Portainer UI, by default hosted at http://cicd.intra:9010
@@ -37,10 +39,6 @@ then log in with username root and the password you just created
 
 Create group 'demo', click on create project and from the top menu, click 'Import project', and import this project.
 Go to Jenkins (http://cicd.intra:8080), and configure settings in Manage Jenkins (eg. install a JDK, Docker cloud, gitlab connection, sonarQube etc.)
-Create a pipeline job in Jenkins, and use the git repository you just created to run the demo/jenkins/cicd.Jenkinsfile
-
-configure docker to use docker daemon by adding custom external network: `docker network create -d overlay external_network
-`
 In Jenkins System Settings, Cloud > Docker set Docker Host URI to tcp://docker.for.win.localhost:2375
-In Tools, configure JDK, then run a freestyle job with a maven step to make sure jdk and maven are installed 
-
+In Tools, configure JDK and maven, then run a freestyle job with a maven step to make sure jdk and maven are installed 
+Create a pipeline job in Jenkins, and use the git repository you just created to run the demo/jenkins/cicd.Jenkinsfile
