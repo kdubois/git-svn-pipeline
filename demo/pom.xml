@@ -13,6 +13,12 @@
         <version>2.0.5.RELEASE</version>
     </parent>
 
+    <properties>
+        <local.server.protocol>http</local.server.protocol>
+        <local.server.host>localhost</local.server.host>
+        <local.server.port>8080</local.server.port>
+    </properties>
+
     <packaging>war</packaging>
 
     <dependencies>
