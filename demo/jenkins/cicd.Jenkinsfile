@@ -6,15 +6,14 @@ def hasDockerizedWebServer = true
 def skipITs = false
 def skipTests = false
 def runSonar = true
-def dockerHost = 'tcp://docker.for.win.localhost:2375'
+def dockerHost = 'tcp://docker.for.win.localhost:2375' // default docker for windows daemon address, replace with eg. /var/run/docker.sock
 def gitGroup = 'root'
-def webServerPort = '8080'
-def debugPort = '8453'
+def webServerPort = '8080' // internal port of the web server
 def gitlabUrl = 'gitlab.intra'
 def serverHost = 'localhost'
 def serverProtocol = 'http'
 def dockerRegistry = "gitlab-registry.intra"
-def dockerCredentialId = "12345679-123456" // configure in Jenkins Credentials
+def dockerCredentialId = "gitlab" // configure in Jenkins Credentials
 def projectPath = 'demo/'
 
 pipeline {
@@ -63,7 +62,7 @@ pipeline {
                 }
             }
         }
-        stage('Build & Deploy Server') {
+        stage('Build & Deploy Test Server') {
             steps {
                 updateGitlabCommitStatus name: 'build', state: 'running'
                 sh "${mvn} clean -DskipTests=true -f ${projectPath}pom.xml"
@@ -73,13 +72,11 @@ pipeline {
                         sh "${mvn} install -DskipTests=true -f ${projectPath}pom.xml -s ${projectPath}.m2/settings.xml"
                         docker.withServer("${dockerHost}") {
                             wlImage = docker.build("${WL_IMAGE}:pipeline", "${projectPath}")
-                            sh "docker run --rm -d -p ${webServerPort} -p ${debugPort} " +
+                            sh "docker run --rm -d -p ${webServerPort} " +
                                     "--name=webserver-${project}-pipeline-${env.BUILD_NUMBER} ${WL_IMAGE}:pipeline"
 
                             // get dynamically generated ports for the webserver server
                             serverPort = sh script: "docker port webserver-${project}-pipeline-${env.BUILD_NUMBER} ${webServerPort}" +
-                                    " | sed 's/.*://' | tr -d '\040\011\012\015'", returnStdout: true
-                            debugPort = sh script: "docker port webserver-${project}-pipeline-${env.BUILD_NUMBER} ${debugPort}" +
                                     " | sed 's/.*://' | tr -d '\040\011\012\015'", returnStdout: true
                         }
 
@@ -89,8 +86,7 @@ pipeline {
                             }
                             // post connection information in Jenkins build description
                             currentBuild.description = "Branch: ${gitlabSourceBranch}<br>" +
-                                    "<a href='${serverProtocol}://${serverHost}:${serverPort}/${appPath}'>App Test Port: ${serverPort}</a><br>" +
-                                    "Debug Port: ${debugPort}"
+                                    "<a href='${serverProtocol}://${serverHost}:${serverPort}/${appPath}'>App Test Port: ${serverPort}</a>"
                         }
                     }
 
@@ -128,7 +124,7 @@ pipeline {
             steps {
                 script {
                     docker.withServer("${dockerHost}") {
-                        withDockerRegistry(credentialsId: "${dockerCredentialId}", url: "${dockerRegistry}") {
+                        withDockerRegistry(credentialsId: "${dockerCredentialId}", url: "${serverProtocol}://${dockerRegistry}") {
 
                             if (params.TAG != '') {
                                 if (binding.hasVariable('wlImage')) {
@@ -143,17 +139,6 @@ pipeline {
                         }
                     }
                 }
-            }
-        }
-        stage('Tag repository') {
-            when {
-                expression {
-                    return params.TAG != ''
-                }
-            }
-            steps {
-                sh "git tag ${params.TAG} --force"
-                sh "git push -f origin ${params.TAG}"
             }
         }
     }
