@@ -36,8 +36,10 @@
     `sudo -u cicd git clone git@github.com:kdubois/jenkins.git /var/repositories/jenkins`
    
 1. Build the jenkins image
-    `sudo docker build -t gitlab-registry.intra/infra/docker/jenkins:latest /var/repositories/jenkins/Docker/jenkins`
-    
+    `sudo docker build -t gitlab-registry.intra/infra/docker/jenkins /var/repositories/jenkins/Docker/jenkins`
+1. Build the svn image
+    `sudo docker build -t gitlab-registry.intra/infra/docker/svn /var/repositories/jenkins/Docker/svn`  
+      
 1. Deploy docker containers using Docker Swarm (can be done on Kubernetes cluster as well). This deploys Jenkins, Gitlab, SonarQube, Artifactory and Portainer instances
     `sudo docker swarm init`
     `sudo docker stack deploy cicd --compose-file=/var/repositories/jenkins/Docker/docker-compose.yml`

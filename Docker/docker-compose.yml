@@ -151,6 +151,26 @@ services:
           cpus: "0.1"
           memory: 300M
 
+  svn:
+    image: gitlab-registry.intra/infra/docker/svn
+    build:
+      context: ./svn
+    ports:
+      - "8081:80"
+      - "3960:3960"
+    networks:
+      - cicd
+    volumes:
+      - subversion_etc:/etc/subversion
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 300M
+
 volumes:
   logs:
   jenkins_home:
@@ -163,6 +183,7 @@ volumes:
   portainer_data:
   gitlab_data:
   gitlab_etc:
+  subversion_etc:
 
 networks:
   cicd:
