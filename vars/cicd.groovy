@@ -29,7 +29,6 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
             DB_IMAGE = "${DOCKER_REGISTRY}/${project}/${project}/db-${project}"
             WL_IMAGE = "${DOCKER_REGISTRY}/${project}/${project}/webserver-${project}"
             GITLAB_URL = "gitlab.intra"
-            ARTIFACTORY_SERVER = "artifactory" // configure an artifactory server connection in the Jenkins artifactory plugin settings
             INTERNAL_SERVER_PORT = "8080"
             INTERNAL_SERVER_DEBUG_PORT = "8453" // default 8453 for weblogic
             INTERNAL_DB_PORT = "50000" // default 50000 for db2
@@ -147,7 +146,7 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
                                 "-DskipITs=${skipITs} -DskipTests=${skipTests} -Duser.timezone=Europe/Brussels " +
                                 "-D${project}.project.db.host=${TEST_URL} -D${project}.project.db.port=${dbport ?: ''} " +
                                 "-Dcontainer.admin.port=${serverport} -Dcontainer.admin.host=${TEST_URL} -f demo/pom.xml "
-                        ${MVN} ${goals}
+                        ${MVN} goals
 
                         if (runSonar){
                             withSonarQubeEnv('SonarQube') {
@@ -155,8 +154,6 @@ def call(String project, String appPath = '', boolean hasDockerizedWebServer = t
                             }
                         }
                     }
-
-
                 }
             }
             // Automated Tests that are in a separate repository
