@@ -55,7 +55,6 @@ pipeline {
                         sh 'git config user.name "jenkins"'
                         sh "git config user.email \"jenkins@${gitlabUrl}\""
                         sh 'git fetch'
-                        sh 'if [ ! -f authors.txt ]; then cp authors_tmp.txt authors.txt; fi'
 
                         sh "   if [ ! -z `git rev-parse --verify --quiet master` ]\n" +
                                 "then\n" +

@@ -14,5 +14,6 @@ RUN apachectl start &&\
     svn checkout --force  --username tester --password tester http://localhost/svn/demo &&\
     cd demo &&\
     mv /tmp/demo/* . &&\
-    svn add * &&\
+    mkdir ./.m2 && mv /tmp/demo/.m2/settings.xml ./.m2/ &&\
+    svn add * .m2 &&\
     svn commit --username tester --password tester --non-interactive -m demo

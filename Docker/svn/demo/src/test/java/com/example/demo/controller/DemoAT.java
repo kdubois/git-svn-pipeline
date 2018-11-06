@@ -14,9 +14,7 @@ import static org.hamcrest.Matchers.equalTo;
 public class DemoAT {
     private static final Logger log = LoggerFactory.getLogger(DemoAT.class);
 
-    @LocalServerPort
-    private int port;
-
+    private String port = System.getProperty("local.server.port");
     private String host = System.getProperty("local.server.host");
     private String protocol = System.getProperty("local.server.protocol");
 

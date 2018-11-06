@@ -14,7 +14,7 @@ def serverHost = 'localhost'
 def serverProtocol = 'http'
 def dockerRegistry = "gitlab-registry.intra"
 def dockerCredentialId = "gitlab" // configure in Jenkins Credentials
-def projectPath = 'demo/'
+def projectPath = './'
 
 pipeline {
     agent any
@@ -104,7 +104,7 @@ pipeline {
                     def goals = "jacoco:prepare-agent install jacoco:report -Dtests.run.argLine= -Dfile.encoding=UTF-8 " +
                             "-DskipITs=${skipITs} -DskipTests=${skipTests} -Duser.timezone=Europe/Brussels " +
                             "-Dlocal.server.port=${serverPort} -Dlocal.server.host=${serverHost} " +
-                            "-Dlocal.server.protocol=${serverProtocol} -f ${projectPath}pom.xml "
+                            "-Dlocal.server.protocol=${serverProtocol} -f ${projectPath}pom.xml -PAT "
                     sh "${mvn} ${goals}"
 
                     if (runSonar) {
