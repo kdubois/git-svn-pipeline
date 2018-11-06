@@ -54,7 +54,7 @@ pipeline {
                             submoduleCfg                     : [],
                             userRemoteConfigs                : [
                                     [
-                                            credentialsId: 'a2f915a3-9e75-42f6-b31e-c2c884d396da',
+                                            credentialsId: 'gitlab',
                                             url          : "${serverProtocol}://${gitlabUrl}/${GIT_REPO}.git"
                                     ]
                             ]])

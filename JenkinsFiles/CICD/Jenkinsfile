@@ -1,5 +1,0 @@
-// Script is located in pipeline_scripts/cicd.groovy and should be added to Jenkins Global Pipeline scripts
-cicd(
-        'demo', // project name
-        'demo' // web path
-)

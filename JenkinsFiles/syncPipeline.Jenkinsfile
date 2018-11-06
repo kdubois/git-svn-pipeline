@@ -5,6 +5,7 @@ def revision = ''
 def gitlabUrl = 'gitlab.intra'
 def svnCredentials = 'svn'
 def serverProtocol = 'http'
+def gitCredentials = 'gitlab'
 
 pipeline {
     agent any
@@ -30,24 +31,45 @@ pipeline {
                             sh "svn --username=${svn_user} --password=${svn_pw} list ${svnRepo} << EOF\n" +
                                     "p\n" +
                                     "EOF"
-                            sh "svn --username=${svn_user} --password=${svn_pw}  export ${svnRepo}/authors.txt authors_tmp.txt"
+                            sh "svn --username=${svn_user} --password=${svn_pw} export ${svnRepo}/authors.txt authors_tmp.txt"
                             sh "echo ${svn_pw} | git svn clone ${revision} --username=${svn_user} --authors-file=authors_tmp.txt --use-log-author ${svnRepo} . "
                         }
-                        sh "git remote add origin ${serverProtocol}://${gitlabUrl}/${gitGroup}/${project}.git"
+
+                        checkout([
+                                $class                           : 'GitSCM',
+                                branches                         : [[name: "origin/master"]],
+                                doGenerateSubmoduleConfigurations: false,
+                                extensions                       : [],
+                                submoduleCfg                     : [],
+                                userRemoteConfigs                : [
+                                        [
+                                                credentialsId: "${gitCredentials}",
+                                                url          : "${serverProtocol}://${gitlabUrl}/${gitGroup}/${project}.git"
+                                        ]
+                                ]])
+
+                        withCredentials([usernamePassword(credentialsId: "${gitCredentials}", passwordVariable: 'git_pw', usernameVariable: 'git_user')]) {
+                            sh "git remote set-url origin ${serverProtocol}://${git_user}:${git_pw}@${gitlabUrl}/${gitGroup}/${project}.git"
+                        }
+
                         sh 'git config user.name "jenkins"'
                         sh "git config user.email \"jenkins@${gitlabUrl}\""
                         sh 'git fetch'
+                        sh 'if [ ! -f authors.txt ]; then cp authors_tmp.txt authors.txt; fi'
 
                         sh "   if [ ! -z `git rev-parse --verify --quiet master` ]\n" +
-                                "   then\n" +
+                                "then\n" +
                                 "     echo \"Branch name master already exists.\"\n" +
-                                "     git branch --set-upstream-to=origin/master master\n" +
-                                "     git push -f origin master\n" +
-                                "   else\n" +
+                                "     git push -f -u origin master\n" +
+                                "else\n" +
                                 "     git push -u origin master\n" +
-                                "     git checkout -b develop\n" +
-                                "     git push -u origin develop\n" +
-                                "   fi   \n"
+                                "fi   \n" +
+                                "if [ -z `git rev-parse --verify --quiet develop` ]\n" +
+                                "then\n" +
+                                "   git checkout -b develop\n" +
+                                "   git push -u origin develop\n" +
+                                "fi"
+
                     }
                 }
             }
@@ -60,10 +82,7 @@ pipeline {
                 sh "git reset --hard origin/master"
                 withCredentials([usernamePassword(credentialsId: "${svnCredentials}", passwordVariable: 'svn_pw', usernameVariable: 'svn_user')]) {
                     script {
-                        svnRebase = sh "echo ${svn_pw} | git svn rebase --use-log-author --authors-file=authors.txt", returnStdout: true
-                        while (svnRebase.contains('CONFLICT')) {
-                            svnRebase = sh script: 'git rebase --skip || true;', returnStdout: true
-                        }
+                        sh "echo ${svn_pw} | git svn rebase --use-log-author --authors-file=authors.txt"
                     }
                 }
                 sh "git push -f origin master"
