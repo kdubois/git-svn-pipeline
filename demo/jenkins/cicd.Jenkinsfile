@@ -55,7 +55,7 @@ pipeline {
                             userRemoteConfigs                : [
                                     [
                                             credentialsId: 'a2f915a3-9e75-42f6-b31e-c2c884d396da',
-                                            url          : "http://${gitlabUrl}/${GIT_REPO}.git"
+                                            url          : "${serverProtocol}://${gitlabUrl}/${GIT_REPO}.git"
                                     ]
                             ]])
                     sh 'git merge origin/master'

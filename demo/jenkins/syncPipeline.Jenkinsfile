@@ -4,6 +4,7 @@ def svnRepo = 'http://svn/svn/demo'
 def revision = ''
 def gitlabUrl = 'gitlab.intra'
 def svnCredentials = 'svn'
+def serverProtocol = 'http'
 
 pipeline {
     agent any
@@ -32,7 +33,7 @@ pipeline {
                             sh "svn --username=${svn_user} --password=${svn_pw}  export ${svnRepo}/authors.txt authors_tmp.txt"
                             sh "echo ${svn_pw} | git svn clone ${revision} --username=${svn_user} --authors-file=authors_tmp.txt --use-log-author ${svnRepo} . "
                         }
-                        sh "git remote add origin ssh://git@${gitlabUrl}/${gitGroup}/${project}.git"
+                        sh "git remote add origin ${serverProtocol}://${gitlabUrl}/${gitGroup}/${project}.git"
                         sh 'git config user.name "jenkins"'
                         sh "git config user.email \"jenkins@${gitlabUrl}\""
                         sh 'git fetch'

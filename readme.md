@@ -36,3 +36,4 @@ In Jenkins System Settings, Cloud > Docker set Docker Host URI to tcp://docker.f
 In Tools, configure JDK and maven, then run a freestyle job with a maven step to make sure jdk and maven are installed 
 Create a pipeline job in Jenkins, and use the git repository you just created to run the demo/jenkins/cicd.Jenkinsfile
 gitlab integration, if using localhost: admin/application_settings > 
+create credentials for svn in jenkins 
