@@ -7,14 +7,15 @@ def skipITs = false
 def skipTests = false
 def runSonar = true
 def dockerHost = 'tcp://docker.for.win.localhost:2375' // default docker for windows daemon address, replace with eg. /var/run/docker.sock
-def gitGroup = 'root'
+def gitGroup = 'demo'
 def webServerPort = '8080' // internal port of the web server
-def gitlabUrl = 'gitlab.intra'
+def gitlabUrl = 'ssh://git@gitlab.intra'
 def serverHost = 'host.docker.internal' // works only on docker for windows, replace with actual ip
 def serverProtocol = 'http'
 def dockerRegistry = "gitlab-registry.intra"
 def dockerCredentialId = "gitlab" // configure in Jenkins Credentials
 def projectPath = './'
+def gitCredentials = 'jenkins-deploy-key'
 
 pipeline {
     agent any
@@ -54,8 +55,8 @@ pipeline {
                             submoduleCfg                     : [],
                             userRemoteConfigs                : [
                                     [
-                                            credentialsId: 'gitlab',
-                                            url          : "${serverProtocol}://${gitlabUrl}/${GIT_REPO}.git"
+                                            credentialsId: "${gitCredentials}",
+                                            url          : "${gitlabUrl}/${GIT_REPO}.git"
                                     ]
                             ]])
                     sh 'git merge origin/master'
@@ -65,11 +66,10 @@ pipeline {
         stage('Build & Deploy Test Server') {
             steps {
                 updateGitlabCommitStatus name: 'build', state: 'running'
-                sh "${mvn} clean -DskipTests=true -f ${projectPath}pom.xml"
                 script {
                     if (hasDockerizedWebServer) {
                         // Build artifact to be deployed in image
-                        sh "${mvn} install -DskipTests=true -f ${projectPath}pom.xml -s ${projectPath}.m2/settings.xml"
+                        sh "${mvn} clean install -DskipTests=true -f ${projectPath}pom.xml -s ${projectPath}.m2/settings.xml"
                         docker.withServer("${dockerHost}") {
                             wlImage = docker.build("${WL_IMAGE}:pipeline", "${projectPath}")
                             sh "docker run --rm -d -p ${webServerPort} " +
@@ -101,7 +101,7 @@ pipeline {
                         skipITs = true
                     }
 
-                    def goals = "jacoco:prepare-agent install jacoco:report -Dtests.run.argLine= -Dfile.encoding=UTF-8 " +
+                    def goals = "jacoco:prepare-agent clean install jacoco:report -Dtests.run.argLine= -Dfile.encoding=UTF-8 " +
                             "-DskipITs=${skipITs} -DskipTests=${skipTests} -Duser.timezone=Europe/Brussels " +
                             "-Dlocal.server.port=${serverPort} -Dlocal.server.host=${serverHost} " +
                             "-Dlocal.server.protocol=${serverProtocol} -f ${projectPath}pom.xml -PAT "

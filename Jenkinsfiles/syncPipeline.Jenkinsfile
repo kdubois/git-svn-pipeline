@@ -1,11 +1,12 @@
 def project = 'demo'
-def gitGroup = 'root'
+def gitGroup = 'demo'
 def svnRepo = 'http://svn/svn/demo'
 def revision = ''
-def gitlabUrl = 'gitlab.intra'
+def gitlabUrl = 'ssh://git@gitlab.intra'
 def svnCredentials = 'svn'
 def serverProtocol = 'http'
-def gitCredentials = 'gitlab'
+def gitCredentials = 'jenkins-deploy-key'
+def cicdPipeline = 'pipeline-demo'
 
 pipeline {
     agent any
@@ -44,13 +45,9 @@ pipeline {
                                 userRemoteConfigs                : [
                                         [
                                                 credentialsId: "${gitCredentials}",
-                                                url          : "${serverProtocol}://${gitlabUrl}/${gitGroup}/${project}.git"
+                                                url          : "${gitlabUrl}/${gitGroup}/${project}.git"
                                         ]
                                 ]])
-
-                        withCredentials([usernamePassword(credentialsId: "${gitCredentials}", passwordVariable: 'git_pw', usernameVariable: 'git_user')]) {
-                            sh "git remote set-url origin ${serverProtocol}://${git_user}:${git_pw}@${gitlabUrl}/${gitGroup}/${project}.git"
-                        }
 
                         sh 'git config user.name "jenkins"'
                         sh "git config user.email \"jenkins@${gitlabUrl}\""
@@ -106,7 +103,7 @@ pipeline {
             steps {
                 script {
                     tagLatest = params.DO_RELEASE == true
-                    build job: "${PROJECT_U}_CICD_Pipeline",
+                    build job: "${cicdPipeline}",
                             parameters: [
                                     string(name: 'PIPELINE_BRANCH', value: 'master'),
                                     string(name: 'TAG', value: "${params.TAG}"),
