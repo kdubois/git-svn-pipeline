@@ -1,13 +1,13 @@
 ## Running a CICD pipeline on RHEL 7 with Docker, Gitlab and Jenkins
 
 ### RHEL Docker install and configuration:
-1. Install Docker-latest:  
-    `sudo yum install docker-latest`
+1. Install Docker (on rhel < 7.5, install docker-latest):  
+    `sudo yum install docker`
     
 1. Add aliases to /etc/hosts for local registry eg.
     `127.0.0.1 gitlab.intra gitlab-registry.intra`    
 
-1. Configure proxy settings 
+1. IF you're behind a corporate proxy, configure proxy settings 
     * create/edit file:  `sudo vi /etc/systemd/system/docker-latest.service.d/http-proxy.conf`
     * Add the following lines:    
         `[Service]`  
@@ -28,6 +28,9 @@
     
 1. Create 'cicd' user & group:  
     `sudo useradd -g cicd cicd`
+
+1. Create a 'jenkins' user with uid 1000
+    `sudo useradd -u 1000 jenkins` 
     
 ### CICD Suite installation
 1. check out this codebase, eg:
@@ -52,8 +55,8 @@
 1. Jenkins configuration:
     * In theory, the jenkins image that is built from the source code in Docker/jenkins/Dockerfile should contain the plugins needed, but you may need to configure some more settings in the 'Manage Jenkins' UI.
     * If maven or java won't execute, check noexec settings of the host  
-        * in my case, /var/lib/docker-latest was mounted as noexec so I had to unmount and remount as exec  
-            eg. `sudo mount -o remount,exec /var/lib/docker-latest`  
+        * in my case, /var/lib/docker was mounted as noexec so I had to unmount and remount as exec  
+            eg. `sudo mount -o remount,exec /var/lib/docker`  
             Do this for every mounted directory.   
         * You may need to update the /etc/fstab file directly if the above doesn't work, and change 'noexec' for the mounted directory to 'exec'. 
         * You'll probably need to restart the server afterwards (`sudo reboot now`) 
