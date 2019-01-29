@@ -1,14 +1,14 @@
 ## Running a CICD pipeline on RHEL 7 with Docker, Gitlab and Jenkins
 
 ### RHEL Docker install and configuration:
-1. Install Docker (on rhel < 7.5, install docker-latest):  
+1. Install Docker (on rhel < 7.5, install docker-latest, and replace 'docker' with 'docker-latest' in all the below commands/paths):  
     `sudo yum install docker`
     
 1. Add aliases to /etc/hosts for local registry eg.
     `127.0.0.1 gitlab.intra gitlab-registry.intra`    
 
 1. IF you're behind a corporate proxy, configure proxy settings 
-    * create/edit file:  `sudo vi /etc/systemd/system/docker-latest.service.d/http-proxy.conf`
+    * create/edit file:  `sudo vi /etc/systemd/system/docker.service.d/http-proxy.conf`
     * Add the following lines:    
         `[Service]`  
         `Environment="HTTP_PROXY=http://{user}:{password}@your_proxy_url:8080" "NO_PROXY=localhost,gitlab-registry.intra,gitlab.intra"`
@@ -18,10 +18,10 @@
     * `export https_proxy=http://{user}:{password}@your_proxy_url:8080`
 
 1. Change docker storage driver to overlay:   
-    `sudo systemctl stop docker-latest`  
+    `sudo systemctl stop docker`  
     `sudo container-storage-setup`  
     `sudo vi /etc/sysconfig/docker-storage` & ADD: `DOCKER_STORAGE_OPTIONS="--storage-driver=overlay"`  
-    `sudo systemctl start docker-latest`
+    `sudo systemctl start docker`
 
 1. Install git:  
     `sudo yum install git`
@@ -61,7 +61,7 @@
         * You may need to update the /etc/fstab file directly if the above doesn't work, and change 'noexec' for the mounted directory to 'exec'. 
         * You'll probably need to restart the server afterwards (`sudo reboot now`) 
     * Add user '1000' to any mounted directory as well  
-        eg. `sudo chown -R 1000:cicd /var/lib/docker-latest/volumes/cicd_jenkins`
+        eg. `sudo chown -R 1000:cicd /var/lib/docker/volumes/cicd_jenkins`
     * In main settings, enable Docker cloud and set Docker URI to `unix:///var/run/docker.sock`      
     * Create deploy key in gitlab, and add it to Jenkins to be able to checkout git projects 
     and push/pull from the docker registry , as well as report build statuses back to Gitlab.
@@ -69,7 +69,7 @@
 
 1. Trouble shooting:
     * **Docker is not responding properly or a service won't restart**:
-        * `sudo systemctl status docker-latest` should show any errors docker is seeing.  
+        * `sudo systemctl status docker` should show any errors docker is seeing.  
         If, for example, a service was restarted while a network reconfiguration was happening, then the network config could have gotten corrupted.  A system reboot would fix the issue.
     * **Git Rebase errors**:
         * If a Jenkins job fails due to a git merge/rebase error, you may need to exec into the jenkins container and go to the workspace to clear up the rebase issue.  Follow these steps to resolve the issue:   
